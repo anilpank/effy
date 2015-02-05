@@ -11,13 +11,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -33,6 +38,11 @@ public class InOutUtils {
 		cb.deleteIfExisting("C:/anil/misc/temp/small.log");
 		System.out.println(cb.size("C:/anil/misc/temp/sameName.log"));
 		System.out.println(cb.sizeInKB("C:/anil/misc/temp/sameName.log"));
+		System.out.println(cb.getLastModifiedTime("C:/anil/misc/temp/sameName.log"));
+		//cb.createFile("C:/anil/misc/temp/ghi.txt");
+		System.out.println(cb.createTempFile().getFileName());
+		cb.createTempFile();
+		cb.createDir("C:/anil/misc/temp/myDir");
 	}
 
 	/**
@@ -265,6 +275,94 @@ public class InOutUtils {
 		Path path = Paths.get(fileName);
 		long bytes = Files.size(path);
 		return bytes/(1024.0*1024.0*1024.0);
-	}	
+	}
+	
+	/**
+	 * Check if the file is a directory
+	 * @param fileName The file name with full path
+	 * @return true if the file is a directory (folder in windows)
+	 */
+	public boolean isDirectory(String fileName) {
+		Path path = Paths.get(fileName);
+		return Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS);
+	}
+	
+	/**
+	 * Check if the file is a symbolic link.
+	 * @param fileName The file name with full path
+	 * @return true if the file is a symbolic link
+	 */
+	public boolean isSymbolicLink(String fileName) {
+		Path path = Paths.get(fileName);
+		return Files.isSymbolicLink(path);
+	}
+	
+	/**
+	 * Get the last modified time as timestamp
+	 * @param fileName File name with full file path
+	 * @return last modified time as timestamp
+	 * @throws IOException
+	 */
+	public Timestamp getLastModifiedTime(String fileName) throws IOException {
+		Path path = Paths.get(fileName);
+		FileTime fileTime = Files.getLastModifiedTime(path, LinkOption.NOFOLLOW_LINKS);
+		Timestamp timestamp = new Timestamp(fileTime.toMillis()) ;
+		return timestamp;
+	}
+	
+	/**
+	 * Create a file
+	 * @param fileName File name with full file path
+	 * @throws IOException
+	 */
+	public void createFile (String fileName) throws IOException {
+		Path path = Paths.get(fileName);
+		Files.createFile(path);
+	}
+	
+	/**
+	 * Create a temporary file.
+	 * File created is very platform specific
+	 * @throws IOException
+	 */
+	public Path createTempFile() throws IOException {
+		Path tempFile = Files.createTempFile(null, ".myapp");
+		System.out.format("The temporary file" +
+		        " has been created: %s%n", tempFile);
+		return tempFile;
+	}
+	
+	/**
+	 * Create a directory
+	 * @param dirName directory name with full path
+	 * @throws IOException
+	 */
+	public void createDir(String dirName) throws IOException {
+		Path dir = Paths.get(dirName);
+		Files.createDirectory(dir);
+	}
+	
+	/**
+	 * Get all directory contents
+	 * @param dirName
+	 * @return List of file names as String
+	 */
+	public List<String> getDirectoryContents(String dirName) {
+		Path dirPath = Paths.get(dirName);
+		List<String> contents = new ArrayList<String>();
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath)) {
+		    for (Path file: stream) {
+		    	contents.add(file.getFileName().toString());
+		        
+		    }
+		} catch (IOException | DirectoryIteratorException x) {
+		    // IOException can never be thrown by the iteration.
+		    // In this snippet, it can only be thrown by newDirectoryStream.
+		    System.err.println(x);
+		}
+		return contents;
+	}
+	
+	
 
 }
