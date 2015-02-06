@@ -1,0 +1,6 @@
+SevenZip
+SevenZip.Compression.LZ
+SevenZip.Compression.LZMA
+SevenZip.Compression.RangeCoder
+com.effy.example
+com.effy.main

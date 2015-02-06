@@ -15,7 +15,7 @@ import java.util.*;
  * print the details to standard out.
  */
 
-public class Email {
+class Email {
 
     private final WatchService watcher;
     private final Path dir;

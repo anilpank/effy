@@ -8,28 +8,43 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
+import org.apache.commons.compress.archivers.sevenz.SevenZOutputFile;
+
+import SevenZip.Compression.LZMA.Encoder;
+
 
 /**
  * ZIP API for compressing and extracting files
  * @author averma
  *
  */
-public class Ziputils {
+public class ZipUtils {
 	static final int BUFFER = 2048;
 
 	public static void main(String[] args) throws DataFormatException, IOException {
 		System.out.println("Anil");
-		Ziputils zu = new Ziputils();
+		ZipUtils zu = new ZipUtils();
 		//zu.compressAndDecompressViaZLib();
 		//zu.unzip("C:/anil/misc/temp/anikl.zip");
+		/*
 		zu.zip("C:/anil/misc/temp/www/gemh101.pdf", "C:/anil/misc/temp/somewierd.zip");
+		zu.compressTo7Z("C:/anil/misc/temp/www/atmel.log", "C:/anil/misc/temp/atmelCom.7z");
+		zu.compressTo7Zip("C:/anil/misc/temp/www/atmel.log", "C:/anil/misc/temp/thisOne.7z");
+		*/
+		zu.compressToGZip("C:/anil/misc/temp/www/images.html", "C:/anil/misc/temp/");
 	}
 
 	private void compressAndDecompressViaZLib() throws UnsupportedEncodingException, DataFormatException {
@@ -148,8 +163,80 @@ public class Ziputils {
 				origin.close();
 			}
 		}
-		
+
 		out.close();
+	}
+
+
+	private void compressTo7Z(String inputFile, String outputDir) throws IOException {
+		/* Read the input file to be compressed */
+		File inputToCompress = new File(inputFile);
+		
+		BufferedInputStream inStream  = new BufferedInputStream(new java.io.FileInputStream(inputToCompress));
+		/* Create output file 7z File */
+		File compressedOutput = new File(outputDir +  FileSystems.getDefault().getSeparator() + 
+				inputToCompress.getName());
+		BufferedOutputStream outStream = new BufferedOutputStream(new java.io.FileOutputStream(compressedOutput));
+		/* Create LZMA Encoder Object / Write Header Information */
+		Encoder encoder = new Encoder();
+		encoder.SetAlgorithm(2);
+		encoder.SetDictionarySize(8388608);
+		encoder.SetNumFastBytes(128);
+		encoder.SetMatchFinder(1);
+		encoder.SetLcLpPb(3,0,2);
+		encoder.SetEndMarkerMode(false);
+		encoder.WriteCoderProperties(outStream);
+		long fileSize;
+		fileSize = inputToCompress.length();
+		for (int i = 0; i < 8; i++)                                     
+		{
+			outStream.write((int)(fileSize >>> (8 * i)) & 0xFF);
+		}                               
+		/* Write Compressed Data to File */     
+		encoder.Code(inStream, outStream, -1, -1, null);
+		/* Close Output Streams*/
+		outStream.flush();
+		outStream.close();
+		inStream.close();
+	}
+
+	private void compressTo7Zip(String inputFile, String output7zFile) throws IOException {
+		File outputFile = new File(output7zFile);
+		SevenZOutputFile sevenZOutput = new SevenZOutputFile(outputFile);		
+		File inFile = new File(inputFile);
+		SevenZArchiveEntry entry = sevenZOutput.createArchiveEntry(inFile, inFile.getName());
+		sevenZOutput.putArchiveEntry(entry);		
+		sevenZOutput.write(Files.readAllBytes(Paths.get(inputFile)));
+		sevenZOutput.closeArchiveEntry();
+	}
+
+	/**
+	 * Compress input file in GZIP (gz) format
+	 * @param inputFile Input file name to be compressed with full path
+	 * @param outputDir Output directory where the compressed file will be written
+	 */
+	public void compressToGZip(String inputFile, String outputDir) {
+		byte[] buffer = new byte[1024];
+
+		try {
+			
+			GZIPOutputStream gzos = 
+					new GZIPOutputStream(new FileOutputStream( outputDir +
+							FileSystems.getDefault().getSeparator() +
+							Paths.get(inputFile).getFileName() +".gz"));
+			FileInputStream in = 
+					new FileInputStream(inputFile);
+			int len;
+			while ((len = in.read(buffer)) > 0) {
+				gzos.write(buffer, 0, len);
+			}
+			in.close();
+			gzos.finish();
+			gzos.close();
+
+		}catch(IOException ex){
+			ex.printStackTrace();   
+		}
 	}
 
 
