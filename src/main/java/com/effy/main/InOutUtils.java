@@ -26,23 +26,32 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+/**
+ * This is utility class where there are lot of file utility methods
+ * @author averma
+ *
+ */
 public class InOutUtils {
 
 	public static void main(String[] args) throws IOException {
 		InOutUtils cb = new InOutUtils();		
 		//cb.nioCopy("C:/anil/misc/temp/serus_app.log.1", "C:/anil/misc/temp/nio.log");
 		//cb.nioMove("C:/anil/misc/temp/serus_app.log.1", "C:/anil/deploy/sencha/sameName.log");
+		/*
 		cb.getAllRootDirs();
 		
 		cb.deleteIfExisting("C:/anil/misc/temp/small.log");
 		System.out.println(cb.size("C:/anil/misc/temp/sameName.log"));
 		System.out.println(cb.sizeInKB("C:/anil/misc/temp/sameName.log"));
-		System.out.println(cb.getLastModifiedTime("C:/anil/misc/temp/sameName.log"));
+		//System.out.println(cb.getLastModifiedTime("C:/anil/misc/temp/sameName.log"));
 		//cb.createFile("C:/anil/misc/temp/ghi.txt");
-		System.out.println(cb.createTempFile().getFileName());
-		cb.createTempFile();
-		cb.createDir("C:/anil/misc/temp/myDir");
+		//System.out.println(cb.createTempFile().getFileName());
+		//cb.createTempFile();
+		//cb.createDir("C:/anil/misc/temp/myDir");
+		 * */
+		 
+		System.out.println(cb.getPathStringSeparator());
+		System.out.println(cb.readFileToString("C:/anil/misc/temp/www/atmel.log"));
 	}
 
 	/**
@@ -361,6 +370,27 @@ public class InOutUtils {
 		    System.err.println(x);
 		}
 		return contents;
+	}
+	
+	/**
+	 * Get the path separator for the given operating system
+	 * The path separator for POSIX file systems is the forward slash, /, and for Microsoft Windows is the backslash, \. 
+	 * Other file systems might use other delimiters.
+	 * @return the path separator as String
+	 */
+	public String getPathStringSeparator() {
+		return FileSystems.getDefault().getSeparator();
+	}
+	
+	
+	/**
+	 * Reads file content to String
+	 * @param inputFile Input file name with complete path
+	 * @return content of the file as String
+	 * @throws IOException
+	 */
+	public String readFileToString(String inputFile) throws IOException {		
+		return new String(Files.readAllBytes(Paths.get(inputFile)));
 	}
 	
 	
