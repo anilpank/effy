@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
+import java.util.zip.DeflaterInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
@@ -22,8 +23,12 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZOutputFile;
-
-import SevenZip.Compression.LZMA.Encoder;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
+import org.tukaani.xz.LZMA2Options;
+import org.tukaani.xz.XZOutputStream;
 
 
 /**
@@ -44,31 +49,14 @@ public class ZipUtils {
 		zu.compressTo7Z("C:/anil/misc/temp/www/atmel.log", "C:/anil/misc/temp/atmelCom.7z");
 		zu.compressTo7Zip("C:/anil/misc/temp/www/atmel.log", "C:/anil/misc/temp/thisOne.7z");
 		*/
-		zu.compressToGZip("C:/anil/misc/temp/www/images.html", "C:/anil/misc/temp/");
+		
+		zu.zip("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/normalCompression.zip");
+		zu.zipHighCompression("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/highCompression.zip");
+		zu.compressToGZip("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/");		
+		zu.compressToXZ("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx.xz");
 	}
 
-	private void compressAndDecompressViaZLib() throws UnsupportedEncodingException, DataFormatException {
-		String inputString = "blahblahblah";
-		byte[] input = inputString.getBytes("UTF-8");
-
-		// Compress the bytes
-		byte[] output = new byte[100];
-		Deflater compresser = new Deflater();
-		compresser.setInput(input);
-		compresser.finish();
-		int compressedDataLength = compresser.deflate(output);
-		compresser.end();
-
-		// Decompress the bytes
-		Inflater decompresser = new Inflater();
-		decompresser.setInput(output, 0, compressedDataLength);
-		byte[] result = new byte[100];
-		int resultLength = decompresser.inflate(result);
-		decompresser.end();
-		// Decode the bytes into a String
-		String outputString = new String(result, 0, resultLength, "UTF-8");
-		System.out.println(outputString);	     
-	}
+	
 
 	/**
 	 * Unzip the file and write all it's contents and files
@@ -111,6 +99,63 @@ public class ZipUtils {
 			}			
 		}
 	}
+	
+	/**
+	 * Compress the file with highest compression ratio ever possible
+	 * @param fileName
+	 * @param outputZipFile
+	 * @throws IOException
+	 */
+	public void zipHighCompression(String fileName, String outputZipFile) throws IOException {
+		BufferedInputStream origin = null;
+		FileOutputStream dest = new 
+				FileOutputStream(outputZipFile);
+		ZipOutputStream out = new ZipOutputStream(new 
+				BufferedOutputStream(dest));
+		out.setLevel(Deflater.BEST_COMPRESSION);
+		byte data[] = new byte[BUFFER];
+		// get a list of files from current directory
+		File f = new File(fileName);
+		if (f.isFile()) {
+			FileInputStream fi = new 
+					FileInputStream(f);
+			origin = new 
+					BufferedInputStream(fi, BUFFER);
+			ZipEntry entry = new ZipEntry(f.getName());
+			out.putNextEntry(entry);
+			int count;
+			while((count = origin.read(data, 0, 
+					BUFFER)) != -1) {
+				out.write(data, 0, count);
+			}
+			origin.close();
+		}
+
+		else {
+			File[] actualFiles = f.listFiles();
+			for (File file : actualFiles) {
+				if (file.isDirectory()) {
+					continue;
+				}
+				FileInputStream fi = new 
+						FileInputStream(file);
+				origin = new 
+						BufferedInputStream(fi, BUFFER);
+				ZipEntry entry = new ZipEntry(file.getName());
+				out.putNextEntry(entry);
+				int count;
+				while((count = origin.read(data, 0, 
+						BUFFER)) != -1) {
+					out.write(data, 0, count);
+				}
+				origin.close();
+			}
+		}
+
+		out.close();
+	}
+
+	
 
 	/**
 	 * Compresses contents of directory into a zip file
@@ -124,7 +169,7 @@ public class ZipUtils {
 		FileOutputStream dest = new 
 				FileOutputStream(outputZipFile);
 		ZipOutputStream out = new ZipOutputStream(new 
-				BufferedOutputStream(dest));			
+				BufferedOutputStream(dest));		
 		byte data[] = new byte[BUFFER];
 		// get a list of files from current directory
 		File f = new File(fileName);
@@ -168,38 +213,7 @@ public class ZipUtils {
 	}
 
 
-	private void compressTo7Z(String inputFile, String outputDir) throws IOException {
-		/* Read the input file to be compressed */
-		File inputToCompress = new File(inputFile);
-		
-		BufferedInputStream inStream  = new BufferedInputStream(new java.io.FileInputStream(inputToCompress));
-		/* Create output file 7z File */
-		File compressedOutput = new File(outputDir +  FileSystems.getDefault().getSeparator() + 
-				inputToCompress.getName());
-		BufferedOutputStream outStream = new BufferedOutputStream(new java.io.FileOutputStream(compressedOutput));
-		/* Create LZMA Encoder Object / Write Header Information */
-		Encoder encoder = new Encoder();
-		encoder.SetAlgorithm(2);
-		encoder.SetDictionarySize(8388608);
-		encoder.SetNumFastBytes(128);
-		encoder.SetMatchFinder(1);
-		encoder.SetLcLpPb(3,0,2);
-		encoder.SetEndMarkerMode(false);
-		encoder.WriteCoderProperties(outStream);
-		long fileSize;
-		fileSize = inputToCompress.length();
-		for (int i = 0; i < 8; i++)                                     
-		{
-			outStream.write((int)(fileSize >>> (8 * i)) & 0xFF);
-		}                               
-		/* Write Compressed Data to File */     
-		encoder.Code(inStream, outStream, -1, -1, null);
-		/* Close Output Streams*/
-		outStream.flush();
-		outStream.close();
-		inStream.close();
-	}
-
+	
 	private void compressTo7Zip(String inputFile, String output7zFile) throws IOException {
 		File outputFile = new File(output7zFile);
 		SevenZOutputFile sevenZOutput = new SevenZOutputFile(outputFile);		
@@ -237,7 +251,48 @@ public class ZipUtils {
 		}catch(IOException ex){
 			ex.printStackTrace();   
 		}
-	}
+	}	
+	
+	/**
+	 * Creates XZ compressed file
+	 * @param inputFile The input file to be zipped with complete path
+	 * @param outputFile The output file generated (preferably with name .xz)
+	 * @throws IOException 
+	 */
+	public static void compressToXZ(String inputFile, String outputFile) throws IOException {
+		FileInputStream inFile = new FileInputStream(inputFile);
+		FileOutputStream outfile = new FileOutputStream(outputFile);
+		LZMA2Options options = new LZMA2Options();
+		options.setPreset(9); // play with this number: 6 is default but 7 works better for mid sized archives ( > 8mb)
+		XZOutputStream out = new XZOutputStream(outfile, options);
 
+		byte[] buf = new byte[8192];
+		int size;
+		while ((size = inFile.read(buf)) != -1)
+		   out.write(buf, 0, size);
+
+		out.finish();
+	}
+	
+	/**
+	 * Compress the file into XZ format. Compression is based on LZMA2 algorithm. 
+	 * Use this method when you need highest compression ratio.
+	 * @param inputFile
+	 * @param outputZippedFile
+	 * @throws IOException 
+	 */
+	public static void compressToXZ(File inputFile, File outputZippedFile) throws IOException {
+		FileInputStream inFile = new FileInputStream(inputFile);
+		FileOutputStream outfile = new FileOutputStream(outputZippedFile);
+		LZMA2Options options = new LZMA2Options();
+		options.setPreset(9); // play with this number: 6 is default but 7 works better for mid sized archives ( > 8mb)
+		XZOutputStream out = new XZOutputStream(outfile, options);
+		byte[] buf = new byte[8192];
+		int size;
+		while ((size = inFile.read(buf)) != -1)
+		   out.write(buf, 0, size);
+
+		out.finish();
+	}
 
 }
