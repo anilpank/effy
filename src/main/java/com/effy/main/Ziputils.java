@@ -11,7 +11,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterInputStream;
@@ -24,9 +26,12 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZOutputFile;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZOutputStream;
 
@@ -48,15 +53,24 @@ public class ZipUtils {
 		zu.zip("C:/anil/misc/temp/www/gemh101.pdf", "C:/anil/misc/temp/somewierd.zip");
 		zu.compressTo7Z("C:/anil/misc/temp/www/atmel.log", "C:/anil/misc/temp/atmelCom.7z");
 		zu.compressTo7Zip("C:/anil/misc/temp/www/atmel.log", "C:/anil/misc/temp/thisOne.7z");
-		*/
-		
+
+
 		zu.zip("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/normalCompression.zip");
 		zu.zipHighCompression("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/highCompression.zip");
 		zu.compressToGZip("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/");		
 		zu.compressToXZ("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx.xz");
+		 
+		zu.createTarAndThenGZip(new File("C:/anil/misc/temp/LotTxWkView.xlsx"), "C:/anil/misc/temp/wierd.tar.gz");
+		*/
+		File file = new File("C:/anil/misc/temp/");
+		if (file.isDirectory()) {
+			File []files = file.listFiles();
+			List<File>fileList = Arrays.asList(files);
+			zu.createTarAndThenGZip(fileList, "C:/logs/" + fileList.get(0).getName() + ".tar.gz");
+		}
 	}
 
-	
+
 
 	/**
 	 * Unzip the file and write all it's contents and files
@@ -99,7 +113,7 @@ public class ZipUtils {
 			}			
 		}
 	}
-	
+
 	/**
 	 * Compress the file with highest compression ratio ever possible
 	 * @param fileName
@@ -155,7 +169,7 @@ public class ZipUtils {
 		out.close();
 	}
 
-	
+
 
 	/**
 	 * Compresses contents of directory into a zip file
@@ -213,7 +227,7 @@ public class ZipUtils {
 	}
 
 
-	
+
 	private void compressTo7Zip(String inputFile, String output7zFile) throws IOException {
 		File outputFile = new File(output7zFile);
 		SevenZOutputFile sevenZOutput = new SevenZOutputFile(outputFile);		
@@ -233,7 +247,7 @@ public class ZipUtils {
 		byte[] buffer = new byte[1024];
 
 		try {
-			
+
 			GZIPOutputStream gzos = 
 					new GZIPOutputStream(new FileOutputStream( outputDir +
 							FileSystems.getDefault().getSeparator() +
@@ -252,7 +266,7 @@ public class ZipUtils {
 			ex.printStackTrace();   
 		}
 	}	
-	
+
 	/**
 	 * Creates XZ compressed file
 	 * @param inputFile The input file to be zipped with complete path
@@ -269,11 +283,11 @@ public class ZipUtils {
 		byte[] buf = new byte[8192];
 		int size;
 		while ((size = inFile.read(buf)) != -1)
-		   out.write(buf, 0, size);
+			out.write(buf, 0, size);
 
 		out.finish();
 	}
-	
+
 	/**
 	 * Compress the file into XZ format. Compression is based on LZMA2 algorithm. 
 	 * Use this method when you need highest compression ratio.
@@ -290,9 +304,61 @@ public class ZipUtils {
 		byte[] buf = new byte[8192];
 		int size;
 		while ((size = inFile.read(buf)) != -1)
-		   out.write(buf, 0, size);
+			out.write(buf, 0, size);
 
 		out.finish();
+	}
+
+	/**
+	 * Create a tar file and then gzip it
+	 * @param inputFile The input file to be tarred and then gzipped
+	 * @param outputFile Output file generated with complete path (format should be tar.gz)
+	 * @throws IOException
+	 */
+	public void createTarAndThenGZip(File inputFile, String outputFile) throws IOException {
+		TarArchiveOutputStream out = null;
+		try {
+			out = new TarArchiveOutputStream(
+					new GZIPOutputStream(
+							new BufferedOutputStream(new FileOutputStream(outputFile))));		     
+			// Add data to out and flush stream
+			TarArchiveEntry entry = new TarArchiveEntry(inputFile, inputFile.getName());
+			out.putArchiveEntry(entry);
+			IOUtils.copy(new FileInputStream(inputFile), out);
+			out.closeArchiveEntry();
+
+		} finally {
+			if(out != null) out.close();
+		}
+	}
+
+	/**
+	 * Archives list of inputFiles into a tar and then gzips it into tar.gz
+	 * @param inputFiles List of input Files to be archived
+	 * @param outputFile Output file to be generated (full path with .tar.gz extension)
+	 * @throws IOException
+	 */
+	public void createTarAndThenGZip(List<File>inputFiles, String outputFile) throws IOException {		
+		TarArchiveOutputStream out = null;
+		try {
+			out = new TarArchiveOutputStream(
+					new GZIPOutputStream(
+							new BufferedOutputStream(new FileOutputStream(outputFile))));			
+			for (File inputFile : inputFiles) {
+				if (inputFile.isFile()) {
+					TarArchiveEntry entry = new TarArchiveEntry(inputFile, inputFile.getName());
+					out.putArchiveEntry(entry);
+					IOUtils.copy(new FileInputStream(inputFile), out);
+					out.closeArchiveEntry();
+				}
+				
+			}			
+			
+
+		}
+		finally {
+			if(out != null) out.close();
+		}
 	}
 
 }
