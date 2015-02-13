@@ -174,11 +174,11 @@ public class ZipUtils {
 	/**
 	 * Compresses contents of directory into a zip file
 	 * Ignores any sub-directories
-	 * @param fileName Full name of the directory including the path
+	 * @param directory Full name of the directory including the path
 	 * @param outputZipFile Full name of zip file including the path
 	 * @throws IOException
 	 */
-	public void zip(String fileName, String outputZipFile) throws IOException {
+	public void zipAllFilesInDir(String directory, String outputZipFile) throws IOException {
 		BufferedInputStream origin = null;
 		FileOutputStream dest = new 
 				FileOutputStream(outputZipFile);
@@ -186,7 +186,7 @@ public class ZipUtils {
 				BufferedOutputStream(dest));		
 		byte data[] = new byte[BUFFER];
 		// get a list of files from current directory
-		File f = new File(fileName);
+		File f = new File(directory);
 		if (f.isFile()) {
 			FileInputStream fi = new 
 					FileInputStream(f);
