@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.zip.Checksum;
-
-import org.apache.commons.io.FileUtils;
 /**
  * This is utility class where there are lot of file utility methods
  * @author averma
@@ -55,7 +53,7 @@ public class InOutUtils {
 		 * */
 		 
 		System.out.println(cb.getPathStringSeparator());
-		System.out.println(cb.readFileToString("C:/anil/misc/temp/www/atmel.log"));
+		System.out.println(cb.readFileToString("C:/anil/misc/temp/runthis.sql"));
 	}
 
 	/**
@@ -397,52 +395,6 @@ public class InOutUtils {
 		return new String(Files.readAllBytes(Paths.get(inputFile)));
 	}
 	
-	/**
-	 * Computes the checksum of a file using the specified checksum object. Multiple files may be checked using one Checksum instance 
-	 * if desired simply by reusing the same checksum object.
-	 * @param file
-	 * @param checksum
-	 * @return
-	 * @throws IOException
-	 */
-	public Checksum checksum(File file, Checksum checksum) throws IOException {
-		return FileUtils.checksum(file, checksum);
-	}
-	
-	/**
-	 * Cleans a directory without deleting it.
-	 * @param directory - Directory to clean
-	 * @throws IOException
-	 */
-	public void cleanDirectory(File directory) throws IOException {
-		FileUtils.cleanDirectory(directory);
-	}
-	
-	/**
-	 * Compares the contents of two files to determine if they are equal or not.
-     * This method checks to see if the two files are different lengths or if they point to the same file, 
-     * before resorting to byte-by-byte comparison of the contents.
-	 * @param file1 - the first file
-	 * @param file2 - the second file
-	 * @return
-	 * @throws IOException
-	 */
-	public boolean contentEquals(File file1, File file2) throws IOException {
-		return FileUtils.contentEquals(file1, file2);
-	}
-	
-	/**
-	 * Copies a file to a directory preserving the file date.
-	 * This method copies the contents of the specified source file to a file of the same name in the specified destination directory. The destination directory is created if it does not exist. If the destination file exists, 
-	 * then this method will overwrite it
-	 * @param srcFile  - an existing file to copy, must not be null
-	 * @param destDir -  the directory to place the copy in, must not be null
-	 * @throws IOException
-	 */
-	public void copyFileToDirectory(File srcFile, File destDir) throws IOException {
-		FileUtils.copyFileToDirectory(srcFile, destDir);
-	}
-	
-	
+		
 
 }
