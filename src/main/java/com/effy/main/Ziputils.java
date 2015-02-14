@@ -83,7 +83,7 @@ public class ZipUtils {
 
 	/**
 	 * Unzip the file and write all it's contents and files
-	 * @param fileName The zip file name with complete path
+	 * @param fileName The zip file name with complete paths
 	 * @throws IOException
 	 */
 	public void unzip(String fileName) throws IOException {
