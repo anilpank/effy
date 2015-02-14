@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
@@ -35,6 +36,10 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZOutputStream;
 
+import com.effy.ftl.FTLTemplateEngine;
+
+import freemarker.template.TemplateException;
+
 
 /**
  * ZIP API for compressing and extracting files
@@ -44,7 +49,7 @@ import org.tukaani.xz.XZOutputStream;
 public class ZipUtils {
 	static final int BUFFER = 2048;
 
-	public static void main(String[] args) throws DataFormatException, IOException {
+	public static void main(String[] args) throws DataFormatException, IOException, TemplateException {
 		System.out.println("Anil");
 		ZipUtils zu = new ZipUtils();
 		//zu.compressAndDecompressViaZLib();
@@ -61,13 +66,17 @@ public class ZipUtils {
 		zu.compressToXZ("C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx", "C:/anil/misc/temp/LotTxWkView_1_20150207-074205-1.xlsx.xz");
 		 
 		zu.createTarAndThenGZip(new File("C:/anil/misc/temp/LotTxWkView.xlsx"), "C:/anil/misc/temp/wierd.tar.gz");
-		*/
+		
 		File file = new File("C:/anil/misc/temp/");
 		if (file.isDirectory()) {
 			File []files = file.listFiles();
 			List<File>fileList = Arrays.asList(files);
 			zu.createTarAndThenGZip(fileList, "C:/logs/" + fileList.get(0).getName() + ".tar.gz");
 		}
+		*/
+		File jarFile = new File("C:/anil/code/working/Effy/target/Effy.jar");
+		File xzFile = new File("C:/anil/misc/temp/Effy.tar.xz");
+		zu.compressToXZ(jarFile, xzFile);
 	}
 
 
