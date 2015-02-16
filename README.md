@@ -21,58 +21,58 @@ Latest javadoc is available here at [Effy JavaDoc](http://anilpank.bitbucket.org
 ## File Compression APIs
 ### Unzipping a zip file
 You can Unzip the file and write all it's contents and files.
-<tt>
+```java
 ZipUtils zipUtil = new ZipUtils();
 zipUtil.unzip("C:/anil/misc/temp/anikl.zip");
-</tt>
+```
 
 ### Compress file into zip with highest compression.
 If the need is to create smallest zip file for a give file, please use the below implementation. This will compress file myFile.xlsx and write it to to the below temp folder. 
-<tt>
+```java
 ZipUtils zipUtil = new ZipUtils();
 zipUtil .zipHighCompression("C:/misc/myFile.xlsx", "C:/anil/misc/temp/");
-</tt>
+```
 
 ### Compress directory contents to a zip file.
 If you want to compress directory contents into a zip file, use below implementation. Please note that this method ignores any sub-directory present in the directory.
 In below implementation, all the files present in logs folder are compressed and zip file log.zip is created.
-<tt>
+```java
 ZipUtils zipUtil = new ZipUtils();
 zipUtil .zipAllFilesInDir("C:/misc/logs", "C:/anil/misc/temp/log.zip");
-</tt>
+```
 
 ### Compress files to GZIP format
 There are scenarios when you do not want a zip format generated but are on the look out for GZIP (.gz) file generation. 
 The below implementation will take the file myFile.xlsx, compress it into gz format and write it in temp folder.
-<tt>
+```java
 ZipUtils zipUtil = new ZipUtils();
 zipUtil.compressToGZip("C:/misc/myFile.xlsx", "C:/anil/misc/temp/");
-</tt>
+```
 
 ### Compress file to XZ format
 XZ compression is based on LZMA2 algorithm. From trying out various formats, we found that XZ format gives maximum compression.
 So if you want maximum compression (and not bothered about format), use this method.
-<tt>
+```java
 ZipUtils zipUtil = new ZipUtils();
 zipUtil.compressToXZ("C:/anil/misc/temp/myFile.xlsx", "C:/anil/misc/temp/myFile.xlsx.xz");
-</tt>
+```
 
 ### Archive multiple files into tar and then gZIP
 Archives list of inputFiles into a tar and then gzips it into tar.gz
-<tt>
+```java
 ZipUtils zipUtil = new ZipUtils();
 File directory = new File("C:/anil/misc/temp/");
 File []files = directory.listFiles();
 List<File>fileList = Arrays.asList(files);
 zipUtil.createTarAndThenGZip(fileList, "C:/logs/" + fileList.get(0).getName() + ".tar.gz");		
-</tt>
+```
 
 ### Unzip the zipped file
 This will unzip a zipped(compressed) file and write all it's contents.
-<tt>
+```java
 ZipUtils zipUtil = new ZipUtils();
 zipUtil.unzip("C:/temp/anikl.zip");
-</tt>
+```
 
 
 ## File IO APIs
@@ -81,7 +81,7 @@ zipUtil.unzip("C:/temp/anikl.zip");
 ## Freemarker APIs
 ### Processing a freemarker String
 If you have a string input with freemarker syntax and you want to process it, please see the below example for implementation
-<tt>
+```java
 HashMap root = new HashMap();
 HashMap employeeMap = new HashMap();
 employeeMap.put("name", "John Mayer");
@@ -92,7 +92,7 @@ employeeMap.put("yearsOfExp", 15);
 root.put("employee",employeeMap);
 String template = "Hi Mr. ${employee.name}, your id is ${employee.id} and your current manager is ${employee.manager}";		
 String output = FTLTemplateEngine.INSTANCE.process(template, root);
-</tt>
+```
 This would give the following output.
 <blockquote>
 Hi Mr. John Mayer, your id is 23 and your current manager is Scott Johnson
