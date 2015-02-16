@@ -1,6 +1,6 @@
 
 
-package com.effy.pdfbox.boxable;
+package org.effy.pdfbox.boxable;
 
 
 import java.io.IOException;

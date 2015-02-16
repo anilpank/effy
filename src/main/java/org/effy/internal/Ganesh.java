@@ -1,4 +1,4 @@
-package com.effy.internal;
+package org.effy.internal;
 /**
  * This is a dummy class. Please ignore this
  * @author averma

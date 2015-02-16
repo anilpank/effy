@@ -1,4 +1,4 @@
-package com.effy.internal;
+package org.effy.internal;
 
 import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;

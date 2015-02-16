@@ -1,4 +1,4 @@
-package com.effy.ftl;
+package org.effy.ftl;
 
 /**
  * Internal class

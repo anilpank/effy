@@ -1,6 +1,6 @@
 
 
-package com.effy.pdfbox.boxable;
+package org.effy.pdfbox.boxable;
 
 import java.awt.Color;
 import org.apache.pdfbox.pdmodel.font.PDFont;

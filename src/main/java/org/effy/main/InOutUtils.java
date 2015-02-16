@@ -1,4 +1,4 @@
-package com.effy.main;
+package org.effy.main;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

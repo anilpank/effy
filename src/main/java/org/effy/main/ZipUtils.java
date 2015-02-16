@@ -1,4 +1,4 @@
-package com.effy.main;
+package org.effy.main;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -33,10 +33,10 @@ import org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStr
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.effy.ftl.FTLTemplateEngine;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZOutputStream;
 
-import com.effy.ftl.FTLTemplateEngine;
 
 import freemarker.template.TemplateException;
 

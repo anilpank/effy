@@ -1,4 +1,4 @@
-package com.effy.ftl;
+package org.effy.ftl;
 
 import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;

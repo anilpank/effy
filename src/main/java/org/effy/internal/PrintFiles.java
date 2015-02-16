@@ -1,4 +1,4 @@
-package com.effy.internal;
+package org.effy.internal;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

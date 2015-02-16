@@ -1,5 +1,5 @@
 
-package com.effy.pdfbox.boxable.examples;
+package org.effy.pdfbox.boxable.examples;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -8,10 +8,10 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.effy.pdfbox.boxable.PdfCell;
+import org.effy.pdfbox.boxable.PdfRow;
+import org.effy.pdfbox.boxable.PdfTable;
 
-import com.effy.pdfbox.boxable.PdfCell;
-import com.effy.pdfbox.boxable.PdfRow;
-import com.effy.pdfbox.boxable.PdfTable;
 
 
 public class PdfExampleA

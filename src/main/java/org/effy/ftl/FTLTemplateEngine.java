@@ -1,11 +1,13 @@
-package com.effy.ftl;
+package org.effy.ftl;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
-import com.effy.string.StringUtils;
+
+import org.effy.string.StringUtils;
+
 import freemarker.core.Environment;
 import freemarker.core.InvalidReferenceException;
 import freemarker.template.Configuration;
