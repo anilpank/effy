@@ -104,3 +104,7 @@ We maintain the javadoc actively
 ### LICENSE ###
 
 * Distributed under the MIT License. (See accompanying file LICENSE or copy at http://opensource.org/licenses/MIT )
+
+# [Bespoke Solutions](http://www.ojblabs.com)
+Brought to you by [OjbLabs](http://www.ojblabs.com) 
+
